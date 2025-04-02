@@ -1,19 +1,19 @@
 import { createClient } from '@clickhouse/client';
 
 // Print configuration for debugging
-const host = process.env.CLICKHOUSE_HOST || 'http://10.10.3.67:8123';
+const url = process.env.CLICKHOUSE_HOST || 'http://10.10.3.67:8123';
 const username = process.env.CLICKHOUSE_USER || 'dlh_user';
 const password = process.env.CLICKHOUSE_PASSWORD || '12zBxmXf';
 const database = process.env.CLICKHOUSE_DATABASE || 'insights';
 
 console.log('ClickHouse Connection Config:');
-console.log(`Host: ${host}`);
+console.log(`URL: ${url}`);
 console.log(`Username: ${username}`);
 console.log(`Database: ${database}`);
 
 // ClickHouse database connection configuration
 const clickhouseClient = createClient({
-  host,
+  url,  // Using url instead of host
   username,
   password,
   database,
@@ -35,4 +35,4 @@ try {
   console.error('Error testing ClickHouse connection:', error);
 }
 
-export default clickhouseClient; 
+export default clickhouseClient;

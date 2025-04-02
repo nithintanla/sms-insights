@@ -22,18 +22,33 @@ async function fetchRawData() {
 
 async function fetchInsightsSummary() {
   try {
+    console.log('Fetching insights summary...');
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/insights/summary`, {
       cache: 'no-store',
     });
     
     if (!res.ok) {
-      throw new Error('Failed to fetch insights summary');
+      const errorData = await res.json();
+      console.error('Insights summary error:', errorData);
+      throw new Error(`Failed to fetch insights summary: ${errorData.details || res.statusText}`);
     }
     
-    return res.json();
-  } catch (error) {
+    const data = await res.json();
+    if (!data || !data.data) {
+      throw new Error('Invalid insights data format');
+    }
+    
+    return { data: data.data, error: null };
+  } catch (error: any) {
     console.error('Error loading insights summary:', error);
-    return { data: null, error: error.message };
+    return { 
+      data: {
+        topTemplates: [],
+        topTelemarketers: [],
+        topIndustries: []
+      }, 
+      error: error.message 
+    };
   }
 }
 
@@ -60,7 +75,7 @@ export default async function RawDataPage() {
 
         {/* Raw Data Section */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Raw Data Sample (Last 5 Records)</h2>
+          <h2 className="text-xl font-semibold mb-4">Raw Data Sample</h2>
           <Suspense fallback={<div>Loading raw data...</div>}>
             {rawError ? (
               <div className="bg-red-50 p-4 rounded">
